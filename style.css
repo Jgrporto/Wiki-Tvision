@@ -308,14 +308,8 @@ i {
     font-size: 18px;
     font-weight: 600;
     margin: 0 0 10px 0;
-}
-
-.article-card p {
-    flex-grow: 1;
-    color: var(--text-light);
-    font-size: 14px;
-    line-height: 1.6;
-    margin: 0 0 20px 0;
+    flex-grow: 1; /* Faz o título ocupar o espaço disponível */
+    margin-bottom: 20px; /* Mantém a distância para o link "Ler mais" */
 }
 
 .article-card span {
@@ -423,4 +417,102 @@ i {
 /* Para Chrome, Safari, Edge e outros baseados em WebKit */
 .main-content::-webkit-scrollbar {
     display: none;
+}
+
+/* --- NOVO: Estilos para o Modo de Edição --- */
+
+/* --- NOVO: Estilo para o Botão Deletar --- */
+#edit-mode-controls #delete-article-btn {
+    background-color: #dc3545; /* Vermelho */
+}
+#edit-mode-controls #delete-article-btn:hover {
+    background-color: #c82333;
+}
+
+/* --- NOVO: Botão para Criar Artigo --- */
+#add-new-article-btn {
+    background-color: #28a745; /* Verde */
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    font-size: 14px;
+    font-family: var(--font-family);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    margin-top: 15px;
+}
+
+#add-new-article-btn:hover {
+    background-color: #218838;
+}
+
+#add-new-article-btn i {
+    margin-right: 8px;
+}
+
+/* Barra de controles de edição */
+#edit-mode-controls {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: var(--text-color);
+    color: white;
+    padding: 15px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    box-shadow: 0 -4px 10px rgba(0,0,0,0.1);
+    z-index: 2000;
+}
+
+#edit-mode-controls button {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 15px;
+    font-family: var(--font-family);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+#edit-mode-controls button:hover {
+    background-color: var(--primary-hover);
+}
+
+#edit-mode-controls #exit-edit-mode-btn {
+    background-color: #6c757d;
+}
+#edit-mode-controls #exit-edit-mode-btn:hover {
+    background-color: #5a6268;
+}
+
+/* Campos de texto editáveis */
+#edit-article-title {
+    width: 100%;
+    font-size: 28px;
+    font-weight: 700;
+    font-family: var(--font-family);
+    padding: 10px;
+    border: 2px dashed var(--primary-color);
+    border-radius: 8px;
+    box-sizing: border-box;
+}
+
+#edit-article-content {
+    width: 100%;
+    min-height: 400px;
+    font-size: 17px;
+    line-height: 1.8;
+    font-family: var(--font-family);
+    padding: 15px;
+    border: 2px dashed var(--primary-color);
+    border-radius: 8px;
+    box-sizing: border-box;
+    margin-top: 20px;
+    resize: vertical;
 }
