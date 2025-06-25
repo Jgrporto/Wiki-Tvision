@@ -29,9 +29,9 @@
             <i id="user-menu-button" class="fa-solid fa-user-circle"></i>
             
             <div id="user-dropdown" class="dropdown-menu">
-                <a href="admin.html" target="_blank">
-                    <i class="fa-solid fa-edit"></i>
-                    <span>Gerenciar Conteúdo</span>
+                <a href="#" id="edit-mode-btn">
+                    <i class="fa-solid fa-pencil"></i>
+                    <span>Modo de Edição</span>
                 </a>
             </div>
         </div>
@@ -72,8 +72,7 @@
                 </div>
             </div>
             
-            <div id="category-view" class="hidden">
-                </div>
+            <div id="category-view" class="hidden"></div>
 
             <div id="article-view" class="hidden">
                 <h2 id="article-title-display"></h2>
@@ -82,6 +81,25 @@
 
         </main>
     </div>
+
+   <div id="edit-mode-controls" class="hidden">
+    <button id="save-changes-btn">
+        <i class="fa-solid fa-save"></i>
+        Salvar Alterações
+    </button>
+    <button id="delete-article-btn">
+        <i class="fa-solid fa-trash-alt"></i>
+        Deletar Artigo
+    </button>
+    <button id="export-json-btn">
+        <i class="fa-solid fa-download"></i>
+        Exportar JSON
+    </button>
+    <button id="exit-edit-mode-btn">
+        <i class="fa-solid fa-times"></i>
+        Sair da Edição
+    </button>
+</div>
 
     <script src="script.js"></script>
 </body>
