@@ -28,21 +28,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Funções de Setup e Lógica Principal ---
 
-    function initializeWiki() {
-        fetch('data.json')
-            .then(response => {
-                if (!response.ok) throw new Error('Erro de rede: ' + response.statusText);
-                return response.json();
-            })
-            .then(data => {
-                if (!localStorage.getItem('tvision_wiki_articles')) {
-                    saveArticlesToStorage(data);
-                }
-                setupEventListeners();
-                showView('welcome');
-            })
-            .catch(error => console.error('Falha ao inicializar a wiki:', error));
-    }
+// Substitua APENAS esta função no seu script.js
+function initializeWiki() {
+    // MODIFICADO: Em vez de buscar 'data.json', busca na nossa nova API
+    fetch('http://127.0.0.1:5000/api/articles')
+        .then(response => {
+            if (!response.ok) throw new Error('Erro de rede ao conectar com a API: ' + response.statusText);
+            return response.json();
+        })
+        .then(data => {
+            // Agora, em vez de ler do localStorage, sempre buscamos do Databricks.
+            // O localStorage servirá como um 'cache' ou para edição offline no futuro.
+            // Por enquanto, vamos simplesmente usar os dados da API.
+            saveArticlesToStorage(data); // Salvamos no localStorage para as outras funções continuarem funcionando
+            
+            setupEventListeners();
+            showView('welcome');
+        })
+        .catch(error => {
+            console.error('Falha ao inicializar a wiki pela API:', error);
+            // Aqui você pode mostrar uma mensagem de erro mais visível na tela
+            document.body.innerHTML = `<div style="text-align: center; padding: 50px; font-family: sans-serif;"><h1>Erro de Conexão</h1><p>Não foi possível conectar ao backend. Verifique se o servidor Python (Flask) está rodando.</p></div>`;
+        });
+}
 
     function setupEventListeners() {
         homeLink.addEventListener('click', (e) => {
