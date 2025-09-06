@@ -1,0 +1,20 @@
+[
+    {
+        "id": 1,
+        "category": "Técnico",
+        "title": "Como Reiniciar o Decodificador XPlus 5000",
+        "content": "Quando um cliente relatar travamentos ou canais que não carregam, siga estes passos para reiniciar o aparelho:\n\n1. Peça ao cliente para desconectar o decodificador da tomada elétrica.\n2. Aguarde 30 segundos. Este passo é crucial para limpar a memória interna do aparelho.\n3. Reconecte o cabo de energia.\n4. Aguarde o sistema iniciar completamente (pode levar de 2 a 3 minutos).\n5. Verifique com o cliente se o problema foi resolvido."
+    },
+    {
+        "id": 2,
+        "category": "Planos",
+        "title": "Detalhes do Plano 'Fibra Total'",
+        "content": "O plano 'Fibra Total' é nosso pacote premium e inclui:\n\n- Velocidade: 500 Mbps de Download / 250 Mbps de Upload\n- Grade de Canais: Todos os canais do plano 'Essencial' + Pacote HBO, Telecine e canais de esporte internacionais.\n- Serviços Adicionais: Acesso ao +Tvision Play com 2 telas simultâneas e 100 horas de gravação em nuvem.\n- Taxa de Instalação: Isenta com fidelidade de 12 meses."
+    },
+    {
+        "id": 6,
+        "category": "Atendimento",
+        "title": "Script para Contato Inicial",
+        "content": "Ao atender um cliente, sempre comece com uma saudação cordial e profissional.\n\nExemplo: \"Obrigado por ligar para a +Tvision, meu nome é [Seu Nome], com quem eu falo?\"\n\nApós a identificação, peça o código de assinante ou CPF do titular para acessar o cadastro."
+    }
+]

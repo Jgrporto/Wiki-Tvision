@@ -1,0 +1,649 @@
+/* style.css (Versão Final Modernizada) */
+
+/* ======================================== */
+/* 1. VARIÁVEIS GLOBAIS E RESET             */
+/* ======================================== */
+:root {
+    /* Paleta de Cores (Modo Claro) */
+    --cor-primaria: #005f73;
+    --cor-secundaria: #0a9396;
+    --cor-fundo: #f8f9fa;
+    --cor-superficie: #ffffff;
+    --cor-texto: #212529;
+    --cor-texto-claro: #ffffff;
+    --cor-borda: #dee2e6;
+    
+    /* Fontes */
+    --fonte-principal: 'Poppins', sans-serif;
+
+    /* Sombras e Bordas Modernizadas */
+    --sombra-suave: 0 4px 12px rgba(0, 0, 0, 0.06);
+    --sombra-hover: 0 8px 24px rgba(0, 0, 0, 0.1);
+    --border-radius: 8px;
+
+    /* Gradiente Moderno */
+    --gradiente-primario: linear-gradient(45deg, var(--cor-secundaria), var(--cor-primaria));
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: var(--fonte-principal);
+    background-color: var(--cor-fundo);
+    color: var(--cor-texto);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* Transição suave para o body */
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* ======================================== */
+/* 2. CABEÇALHO (NAVBAR)                    */
+/* ======================================== */
+.navbar {
+    display: flex; justify-content: space-between; align-items: center; padding: 12px 24px;
+    background-color: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    position: sticky; top: 0; left: 0; width: 100%; z-index: 1000;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+.navbar-brand a { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--cor-primaria); transition: opacity 0.2s; }
+.navbar-brand a:hover { opacity: 0.8; }
+.navbar-brand h1 { font-size: 1.5rem; font-weight: 600; margin: 0; }
+.navbar-menu { display: flex; align-items: center; gap: 16px; }
+.sidebar-toggle { background: none; border: none; color: var(--cor-texto); font-size: 1.6rem; cursor: pointer; padding: 8px; border-radius: var(--border-radius); transition: background-color 0.2s; }
+.sidebar-toggle:hover { background-color: rgba(0, 0, 0, 0.05); }
+
+
+/* ======================================== */
+/* 3. SIDEBAR (Estilos originais mantidos)  */
+/* ======================================== */
+.sidebar { position: fixed; top: 0; right: 0; height: 100vh; width: 280px; background-color: var(--cor-superficie); z-index: 1100; transform: translateX(100%); transition: transform 0.3s ease-in-out, background-color 0.3s ease; box-shadow: -4px 0 12px rgba(0,0,0,0.1); }
+.sidebar.open { transform: translateX(0); }
+.sidebar-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 1050; opacity: 0; visibility: hidden; transition: opacity 0.3s; }
+.sidebar-overlay.open { opacity: 1; visibility: visible; }
+.sidebar-header { padding: 24px; border-bottom: 1px solid var(--cor-borda); transition: border-color 0.3s ease; }
+.sidebar-header h3 { font-weight: 600; font-size: 1.1rem; color: var(--cor-primaria); margin: 0; }
+.sidebar-menu-list { list-style: none; padding-top: 16px; }
+.sidebar-menu-list li a { display: flex; align-items: center; gap: 16px; padding: 14px 24px; margin: 4px 0; text-decoration: none; color: var(--cor-texto); font-weight: 500; transition: all 0.2s; }
+.sidebar-menu-list li a:hover { background-color: var(--cor-fundo); color: var(--cor-primaria); }
+.sidebar-menu-list hr { margin: 16px 24px; border: none; border-top: 1px solid var(--cor-borda); transition: border-color 0.3s ease; }
+
+
+/* ======================================== */
+/* 4. CONTEÚDO E BUSCA                      */
+/* ======================================== */
+.main-container { padding: 32px; max-width: 1200px; margin: 0 auto; }
+.hero-section { text-align: center; padding: 48px 24px; background-color: var(--cor-superficie); border-radius: var(--border-radius); margin-bottom: 48px; transition: background-color 0.3s ease; }
+.hero-search-container { display: flex; max-width: 600px; margin: 0 auto; border-radius: var(--border-radius); box-shadow: var(--sombra-suave); border: 1px solid transparent; transition: all 0.2s ease-in-out; }
+.hero-search-container:focus-within { border-color: var(--cor-primaria); box-shadow: 0 0 0 3px rgba(0, 95, 115, 0.2); }
+#hero-search-input { flex-grow: 1; border: none; padding: 14px 20px; font-size: 1rem; border-radius: var(--border-radius) 0 0 var(--border-radius); background: none; color: var(--cor-texto); }
+#hero-search-input:focus { outline: none; }
+#hero-search-btn { border: none; background: var(--gradiente-primario); color: var(--cor-texto-claro); padding: 0 24px; font-size: 1.2rem; cursor: pointer; border-radius: 0 var(--border-radius) var(--border-radius) 0; transition: opacity 0.2s; }
+#hero-search-btn:hover { opacity: 0.9; }
+.quick-access { text-align: center; }
+.quick-access h3 { font-size: 1.5rem; margin-bottom: 24px; font-weight: 600; }
+.card-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px; }
+.card { background-color: var(--cor-superficie); padding: 32px 24px; border-radius: var(--border-radius); box-shadow: var(--sombra-suave); text-align: center; cursor: pointer; transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, background-color 0.3s ease; }
+.card:hover { transform: translateY(-8px); box-shadow: var(--sombra-hover); }
+.card i { font-size: 2.5rem; color: var(--cor-secundaria); margin-bottom: 16px; }
+.card span { font-weight: 600; font-size: 1.1rem; }
+
+/* ======================================== */
+/* 5. TELA DE CATEGORIA E RESULTADOS DE BUSCA */
+/* ======================================== */
+
+/* --- Cabeçalho da Categoria/Busca --- */
+.category-header-main {
+    padding: 24px;
+    margin-bottom: 32px;
+    background-color: var(--cor-superficie);
+    border-radius: var(--border-radius);
+    border-left: 5px solid var(--cor-primaria); /* Destaque visual */
+}
+
+.category-header-main h2 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.category-header-main p {
+    margin-top: 8px;
+    color: #6c757d; /* Cinza para texto secundário */
+}
+
+/* --- Botão de Voltar (Reutilizável) --- */
+.header-back-btn {
+    display: inline-flex; /* Para alinhar ícone e texto */
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: 1px solid var(--cor-borda);
+    color: var(--cor-texto);
+    padding: 8px 16px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    border-radius: 50px; /* Formato de pílula */
+    cursor: pointer;
+    margin-bottom: 24px;
+    transition: all 0.2s ease-in-out;
+}
+
+.header-back-btn:hover {
+    background-color: #e9ecef;
+    border-color: #adb5bd;
+}
+
+/* --- Grid da Lista de Artigos --- */
+.article-grid {
+    display: grid;
+    gap: 16px;
+}
+
+.article-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px;
+    background-color: var(--cor-superficie);
+    border-radius: var(--border-radius);
+    box-shadow: var(--sombra-suave);
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.article-card:hover {
+    transform: translateX(8px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.article-card h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.article-card span {
+    font-weight: 500;
+    color: var(--cor-secundaria);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap; /* Evita que "Ler mais" quebre a linha */
+}
+
+/* ======================================== */
+/* 6. TELA DE LEITURA DO ARTIGO             */
+/* ======================================== */
+
+#article-view {
+    background-color: var(--cor-superficie);
+    padding: 24px 32px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--sombra-suave);
+}
+
+/* --- Título do Artigo --- */
+#article-title-display {
+    padding-bottom: 24px;
+    margin-bottom: 24px;
+    border-bottom: 1px solid var(--cor-borda);
+}
+
+#article-title-display h2 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    line-height: 1.3;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+/* --- Conteúdo do Artigo (Formatando a saída do Editor) --- */
+#article-content-display {
+    font-size: 1.1rem;
+    line-height: 1.7; /* Aumenta o espaçamento entre linhas para leitura */
+}
+
+/* Remove margem do topo do primeiro elemento para alinhar com o título */
+#article-content-display > *:first-child {
+    margin-top: 0;
+}
+
+#article-content-display p,
+#article-content-display ul,
+#article-content-display ol,
+#article-content-display blockquote {
+    margin-bottom: 1.25rem;
+}
+
+#article-content-display h1,
+#article-content-display h2,
+#article-content-display h3 {
+     margin-top: 2rem;
+     margin-bottom: 1rem;
+     font-weight: 600;
+     line-height: 1.4;
+}
+
+#article-content-display a {
+    color: var(--cor-secundaria);
+    text-decoration: none;
+    font-weight: 500;
+}
+#article-content-display a:hover {
+    text-decoration: underline;
+}
+
+#article-content-display ul, 
+#article-content-display ol {
+    padding-left: 2rem; /* Adiciona indentação para listas */
+}
+
+#article-content-display li {
+    margin-bottom: 0.5rem;
+}
+
+#article-content-display img {
+    max-width: 100%; /* Garante que imagens nunca quebrem o layout */
+    height: auto;
+    border-radius: var(--border-radius);
+    margin: 1.5rem 0;
+}
+
+#article-content-display blockquote {
+    border-left: 4px solid var(--cor-borda);
+    padding-left: 1.5rem;
+    color: #6c757d;
+    font-style: italic;
+}
+
+/* ======================================== */
+/* 7. TRANSIÇÕES E ANIMAÇÕES                */
+/* ======================================== */
+
+/* Define a animação de entrada */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(15px); /* Começa um pouco abaixo */
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Aplica a animação a qualquer 'view' que se torna visível */
+#welcome-view:not(.hidden),
+#category-view:not(.hidden),
+#article-view:not(.hidden),
+#admin-view:not(.hidden),
+#editor-view:not(.hidden) {
+    animation: fadeIn 0.4s ease-out;
+}
+
+/* Para evitar que as views 'escondidas' ocupem espaço ou aceitem cliques */
+.hidden {
+    display: none;
+}
+
+/* ======================================== */
+/* 8. PAINEL ADMINISTRATIVO                 */
+/* ======================================== */
+
+/* --- Estilos de Botão Reutilizáveis --- */
+.btn {
+    padding: 10px 20px;
+    font-size: 1rem;
+    font-weight: 500;
+    border: 1px solid transparent;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-primary {
+    background-color: var(--cor-primaria);
+    color: var(--cor-texto-claro);
+}
+.btn-primary:hover {
+    background-color: #004250; /* Tom mais escuro da cor primária */
+}
+
+.btn-secondary {
+    background-color: #6c757d; /* Cinza */
+    color: var(--cor-texto-claro);
+}
+.btn-secondary:hover {
+    background-color: #5a6268;
+}
+
+.btn-danger {
+    background-color: #dc3545; /* Vermelho */
+    color: var(--cor-texto-claro);
+}
+.btn-danger:hover {
+    background-color: #c82333;
+}
+
+.btn-sm {
+    padding: 6px 12px;
+    font-size: 0.9rem;
+}
+
+/* --- Layout do Painel Admin --- */
+
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 24px;
+    margin-bottom: 24px;
+    border-bottom: 1px solid var(--cor-borda);
+}
+
+.admin-header h2 {
+    font-size: 1.8rem;
+    margin: 0;
+}
+
+.admin-article-list {
+    display: grid;
+    gap: 16px;
+}
+
+.admin-article-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background-color: var(--cor-superficie);
+    border-radius: var(--border-radius);
+    box-shadow: var(--sombra-suave);
+}
+
+.admin-article-item-info h4 {
+    margin: 0 0 4px 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.admin-article-item-info span {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.admin-article-item-actions {
+    display: flex;
+    gap: 12px;
+}
+
+/* ======================================== */
+/* 9. TELA DO EDITOR DE ARTIGO              */
+/* ======================================== */
+
+/* --- Layout Geral do Formulário --- */
+#editor-wrapper {
+    margin-top: 24px;
+}
+
+/* Campos de Título e Categoria */
+#edit-article-title,
+#edit-article-category {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 1.1rem;
+    font-family: var(--fonte-principal);
+    border: 1px solid var(--cor-borda);
+    border-radius: var(--border-radius);
+    margin-bottom: 24px;
+    transition: all 0.2s ease-in-out;
+}
+
+#edit-article-title:focus,
+#edit-article-category:focus {
+    outline: none;
+    border-color: var(--cor-secundaria);
+    box-shadow: 0 0 0 3px rgba(10, 147, 150, 0.2);
+}
+
+/* --- Wrapper do Editor Quill.js --- */
+#quill-wrapper {
+    border: 1px solid var(--cor-borda);
+    border-radius: var(--border-radius);
+    overflow: hidden; /* Garante que o border-radius seja aplicado nos filhos */
+}
+
+/* Barra de Ferramentas */
+#quill-toolbar-container {
+    padding: 8px;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid var(--cor-borda);
+}
+
+/* Área de Edição */
+#quill-editor-container {
+    min-height: 300px;
+    font-size: 1.1rem;
+    background-color: var(--cor-superficie);
+}
+
+/* Botão de Salvar */
+.form-actions {
+    margin-top: 24px;
+    text-align: right;
+}
+
+
+/* --- Estilos para o MODO TELA CHEIA --- */
+
+#quill-wrapper.fullscreen-mode {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    z-index: 2000; /* Z-index altíssimo para cobrir tudo */
+    border: none;
+    border-radius: 0;
+    background-color: var(--cor-fundo);
+
+    /* Usa flexbox para que o editor ocupe o espaço restante */
+    display: flex;
+    flex-direction: column;
+}
+
+#quill-wrapper.fullscreen-mode #quill-editor-container {
+    flex-grow: 1; /* Faz o editor expandir para preencher a tela */
+    height: auto;
+}
+
+/* ======================================== */
+/* 10. AJUSTE FINO - BOTÃO TELA CHEIA (VERSÃO FINAL) */
+/* ======================================== */
+
+#quill-toolbar-container {
+    position: relative;
+    /* Adicionamos um espaço reservado na direita para o botão não sobrepor outros ícones */
+    padding-right: 45px !important; 
+}
+
+.fullscreen-container {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+/* Exemplo 2: CSS para Navbar com Mega Menu */
+.navbar-megamenu {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 24px; background-color: #fff; border-bottom: 1px solid #eee;
+    height: 70px;
+}
+.navbar-megamenu .navbar-brand a { display:flex; align-items:center; gap:12px; text-decoration:none; color:#333; }
+.navbar-megamenu .navbar-brand h1 { font-size:1.4rem; }
+.megamenu-nav ul { list-style: none; display: flex; }
+.megamenu-nav > ul > li { position: relative; } /* Ponto de referência para o painel */
+.megamenu-nav > ul > li > a {
+    display: flex; align-items: center; gap: 8px; padding: 0 20px;
+    height: 70px; text-decoration: none; color: #333; font-weight: 500;
+    transition: all 0.2s; border-bottom: 3px solid transparent;
+}
+.megamenu-nav > ul > li > a:hover { color: #0d6efd; border-bottom-color: #0d6efd; }
+.megamenu-nav a i { font-size: 0.7rem; }
+
+/* O Painel do Mega Menu */
+.megamenu-panel {
+    position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+    width: 600px; background-color: #fff; border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1); padding: 24px;
+    display: flex; gap: 24px;
+    /* Escondido por padrão */
+    opacity: 0; visibility: hidden; transition: all 0.3s ease;
+}
+/* Aparece no hover do item pai */
+li.has-megamenu:hover .megamenu-panel { opacity: 1; visibility: visible; top: 90%; }
+.megamenu-coluna { display: flex; flex-direction: column; gap: 12px; width:100%; }
+.megamenu-coluna h4 { display:flex; align-items:center; gap:8px; border-bottom:1px solid #eee; padding-bottom:8px; margin-bottom:8px; }
+.megamenu-coluna a { text-decoration: none; color: #555; padding: 4px 0; }
+.megamenu-coluna a:hover { color: #0d6efd; }
+
+
+/* ======================================== */
+/* 11. ESTILOS DE CONTEÚDO QUILL.JS         */
+/* (Para a visualização pública)            */
+/* ======================================== */
+
+/* Alinhamento de Texto */
+#article-content-display .ql-align-center {
+    text-align: center;
+}
+#article-content-display .ql-align-right {
+    text-align: right;
+}
+#article-content-display .ql-align-justify {
+    text-align: justify;
+}
+
+/* Tamanhos de Fonte */
+#article-content-display .ql-size-small {
+    font-size: 0.75em;
+}
+#article-content-display .ql-size-large {
+    font-size: 1.5em;
+}
+#article-content-display .ql-size-huge {
+    font-size: 2.5em;
+}
+
+/* Formatos de Bloco */
+#article-content-display blockquote {
+    border-left: 4px solid #ccc;
+    margin-bottom: 5px;
+    margin-top: 5px;
+    padding-left: 16px;
+}
+#article-content-display code {
+    background-color: #f0f0f0;
+    border-radius: 3px;
+    padding: 3px;
+}
+#article-content-display pre {
+    background-color: #23241f;
+    color: #f8f8f2;
+    overflow: visible;
+    white-space: pre-wrap;
+    margin-bottom: 5px;
+    margin-top: 5px;
+    padding: 5px 10px;
+    border-radius: 3px;
+}
+
+/* Vídeos (para garantir que fiquem responsivos) */
+#article-content-display iframe.ql-video {
+    width: 100%;
+    height: 480px; /* Ajuste a altura se desejar */
+}
+
+/* ======================================== */
+/* 12. MODO ESCURO (DARK MODE)              */
+/* ======================================== */
+
+/* --- Novas Variáveis para o Modo Escuro --- */
+body.dark-mode {
+    --cor-fundo: #121212;
+    --cor-superficie: #1e1e1e;
+    --cor-texto: #e2e8f0;
+    --cor-borda: #3e4c5a;
+    --cor-primaria: #25a1ab; /* Ciano mais brilhante para contraste */
+    --cor-navbar-dark: #002b36; /* Azul-marinho profundo (Opção B) */
+}
+
+/* Ajustes finos para componentes no modo escuro */
+body.dark-mode .navbar {
+    background-color: var(--cor-navbar-dark);
+    border-bottom-color: var(--cor-borda);
+}
+body.dark-mode .navbar-brand a, body.dark-mode .sidebar-toggle {
+    color: var(--cor-texto);
+}
+body.dark-mode .sidebar-toggle:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+body.dark-mode .sidebar-menu-list li a:hover {
+    background-color: var(--cor-fundo);
+}
+body.dark-mode .hero-search-container {
+    background-color: var(--cor-superficie);
+}
+
+/* --- Estilo do Botão de Tema na Sidebar --- */
+.sidebar-theme-toggle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 24px;
+    font-weight: 500;
+}
+.theme-toggle {
+    background-color: #e9ecef;
+    border: none;
+    border-radius: 50px;
+    position: relative;
+    width: 50px;
+    height: 26px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: background-color 0.3s ease;
+}
+.theme-toggle .icon-moon, .theme-toggle .icon-sun {
+    position: absolute;
+    font-size: 0.8rem;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    color: var(--cor-primaria);
+}
+.theme-toggle .icon-moon { transform: translateX(6px); }
+.theme-toggle .icon-sun { transform: translateX(28px); opacity: 0;}
+
+/* Lógica visual do botão no modo escuro */
+body.dark-mode .theme-toggle {
+    background-color: var(--cor-fundo);
+}
+body.dark-mode .theme-toggle .icon-moon {
+    transform: translateX(28px);
+    opacity: 0;
+}
+body.dark-mode .theme-toggle .icon-sun {
+    transform: translateX(6px);
+    opacity: 1;
+}
