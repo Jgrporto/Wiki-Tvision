@@ -1,26 +1,33 @@
-// js/editor.js (Corrigido para usar URL de imagens/vídeos)
-
 import Quill from 'https://esm.sh/quill@1.3.6';
 import ImageResize from 'https://esm.sh/quill-image-resize-module@3.0.0';
 import * as D from './dom.js';
 import { showView } from './ui.js';
+import * as Storage from './storage.js';
 
-// As importações do Firebase Storage foram REMOVIDAS.
 let quillEditor = null;
 
-export function displayFormView({ article = null, onSave, onBack }) {
+export async function displayFormView({ article = null, onSave, onBack }) {
     showView('editor');
-    const isEditing = article !== null;
+    
+    const isEditing = article && article.id;
+    const categories = await Storage.fetchCategories();
 
     D.editorView.innerHTML = `
         <button class="header-back-btn"><i class="fa-solid fa-arrow-left"></i> Voltar ao Painel</button>
         <h2>${isEditing ? 'Editar Artigo' : 'Criar Novo Artigo'}</h2>
         
         <div id="editor-wrapper">
-            <input type="text" id="edit-article-title" placeholder="Título do artigo" value="${isEditing ? article.title.replace(/"/g, '&quot;') : ''}">
+            
+            <input type="text" id="edit-article-title" placeholder="Título do artigo" value="${(article && article.title) ? article.title.replace(/"/g, '&quot;') : ''}">
+            
             <select id="edit-article-category">
-                <option value="" disabled ${!isEditing ? 'selected' : ''}>Selecione uma categoria</option>
-                ${["Técnico", "Planos", "Atendimento", "Políticas"].map(cat => `<option value="${cat}" ${isEditing && article.category === cat ? 'selected' : ''}>${cat}</option>`).join('')}
+                <option value="" disabled ${!article || !article.category ? 'selected' : ''}>Selecione uma categoria</option>
+                
+                ${categories.map(cat => 
+                    `<option value="${cat.name}" ${article && article.category === cat.name ? 'selected' : ''}>
+                        ${cat.name}
+                    </option>`
+                ).join('')}
             </select>
             
             <div id="quill-wrapper">
@@ -51,7 +58,7 @@ export function displayFormView({ article = null, onSave, onBack }) {
 
     quillEditor = new Quill('#quill-editor-container', {
         modules: {
-            toolbar: '#quill-toolbar-container', // Handler customizado removido
+            toolbar: '#quill-toolbar-container',
             imageResize: {
                 modules: ['Resize', 'DisplaySize', 'Toolbar']
             }
@@ -60,11 +67,10 @@ export function displayFormView({ article = null, onSave, onBack }) {
         placeholder: 'Comece a escrever seu artigo aqui...'
     });
 
-    if (isEditing && article.content) {
+    if (article && article.content) {
         quillEditor.root.innerHTML = article.content;
     }
     
-    // --- LÓGICA DOS BOTÕES E FUNCIONALIDADES ---
     const backButton = D.editorView.querySelector('.header-back-btn');
     const saveButton = D.editorView.querySelector('#save-article-btn');
     const fullscreenButton = D.editorView.querySelector('#fullscreen-btn');
@@ -95,7 +101,6 @@ export function displayFormView({ article = null, onSave, onBack }) {
         });
     }
 
-    // --- LÓGICA COMPLETA DO MODO TELA CHEIA ---
     const handleEscKey = (e) => {
         if (e.key === "Escape" && D.editorView.classList.contains('fullscreen-active')) {
             toggleFullscreen();
@@ -105,12 +110,9 @@ export function displayFormView({ article = null, onSave, onBack }) {
     const toggleFullscreen = () => {
         const quillWrapper = D.editorView.querySelector('#quill-wrapper');
         const fullscreenIcon = fullscreenButton.querySelector('i');
-
         quillWrapper.classList.toggle('fullscreen-mode');
         D.editorView.classList.toggle('fullscreen-active');
-        
         const isFullscreen = quillWrapper.classList.contains('fullscreen-mode');
-        
         if (isFullscreen) {
             fullscreenIcon.classList.remove('fa-expand');
             fullscreenIcon.classList.add('fa-compress');
@@ -123,6 +125,5 @@ export function displayFormView({ article = null, onSave, onBack }) {
             document.removeEventListener('keydown', handleEscKey);
         }
     };
-
     fullscreenButton.addEventListener('click', toggleFullscreen);
 }
