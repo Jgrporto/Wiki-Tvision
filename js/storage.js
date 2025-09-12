@@ -1,54 +1,34 @@
-// js/storage.js (Refatorado para Firebase Firestore)
+// js/storage.js (Versão Final com Sincronização de Categorias)
 
-// Importa a referência do banco de dados do nosso arquivo de configuração
 import { db } from './firebase-config.js';
+import { collection, getDocs, addDoc, doc, updateDoc, deleteDoc, query, where } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
-// Importa as funções do Firestore que vamos usar
-import { collection, getDocs, addDoc, doc, updateDoc, deleteDoc, query, limit } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
-
-// Referência à coleção 'articles' no Firestore. Pense nisso como a "tabela" de artigos.
+// === REFERÊNCIAS DAS COLEÇÕES ===
 const articlesCollection = collection(db, 'articles');
+const categoriesCollection = collection(db, 'categories');
 
-// Mantemos os artigos padrão para popular o banco de dados na primeira vez
-const defaultArticles = [
-    { 
-        category: "Técnico", 
-        title: "Como reiniciar o modem +TV", 
-        content: "<p>Para reiniciar o modem, primeiro <strong>desconecte o cabo de energia</strong>. Espere 30 segundos e conecte novamente. As luzes começarão a piscar.</p>", 
-        images: {} 
-    },
-    { 
-        category: "Planos", 
-        title: "Vantagens do Plano Família", 
-        content: "<p>O Plano Família oferece 4 pontos de acesso e 200 canais em alta definição. É ideal para residências com múltiplos televisores.</p><ul><li>Ponto Principal</li><li>Até 3 pontos adicionais</li></ul>", 
-        images: {} 
-    }
-];
+
+// === FUNÇÕES DOS ARTIGOS ===
 
 /**
  * Busca todos os artigos do Firestore.
- * Esta função agora é ASSÍNCRONA.
- * @returns {Promise<Array>} Uma promessa que resolve para uma lista de artigos.
  */
 export async function fetchArticles() {
     try {
         const querySnapshot = await getDocs(articlesCollection);
         const articles = [];
         querySnapshot.forEach((doc) => {
-            // Adicionamos o ID do documento (gerado pelo Firebase) ao objeto de dados
             articles.push({ id: doc.id, ...doc.data() });
         });
         return articles;
     } catch (error) {
         console.error("Erro ao buscar artigos: ", error);
-        return []; // Retorna uma lista vazia em caso de erro
+        return [];
     }
 }
 
 /**
  * Cria um novo artigo no Firestore.
- * @param {object} articleData - Os dados do novo artigo (título, conteúdo, etc.).
- * @returns {Promise<string|null>} O ID do novo artigo criado ou null em caso de erro.
  */
 export async function createArticleInDb(articleData) {
     try {
@@ -63,8 +43,6 @@ export async function createArticleInDb(articleData) {
 
 /**
  * Atualiza um artigo existente no Firestore.
- * @param {string} articleId - O ID do artigo a ser atualizado.
- * @param {object} articleData - Os novos dados do artigo.
  */
 export async function updateArticleInDb(articleId, articleData) {
     try {
@@ -78,7 +56,6 @@ export async function updateArticleInDb(articleId, articleData) {
 
 /**
  * Deleta um artigo do Firestore.
- * @param {string} articleId - O ID do artigo a ser deletado.
  */
 export async function deleteArticleInDb(articleId) {
     try {
@@ -90,19 +67,88 @@ export async function deleteArticleInDb(articleId) {
 }
 
 
+// === FUNÇÕES DAS CATEGORIAS ===
+
 /**
- * Verifica se o banco de dados está vazio e, se estiver, adiciona os artigos padrão.
+ * Busca todas as categorias do Firestore.
  */
-export async function initializeStorage() {
-    const q = query(articlesCollection, limit(1));
-    const querySnapshot = await getDocs(q);
-    
-    if (querySnapshot.empty) {
-        console.log("Banco de dados vazio. Populando com artigos padrão...");
-        for (const article of defaultArticles) {
-            await addDoc(articlesCollection, article);
-        }
-    } else {
-        console.log("O banco de dados já contém dados.");
+export async function fetchCategories() {
+    try {
+        const querySnapshot = await getDocs(categoriesCollection);
+        const categories = [];
+        querySnapshot.forEach((doc) => {
+            categories.push({ id: doc.id, ...doc.data() });
+        });
+        return categories.sort((a, b) => a.name.localeCompare(b.name));
+    } catch (error) {
+        console.error("Erro ao buscar categorias: ", error);
+        return [];
     }
+}
+
+/**
+ * Cria uma nova categoria no Firestore.
+ */
+export async function createCategory(categoryName) {
+    try {
+        await addDoc(categoriesCollection, { name: categoryName });
+        console.log("Categoria criada com sucesso: ", categoryName);
+    } catch (error) {
+        console.error("Erro ao criar categoria: ", error);
+    }
+}
+
+/**
+ * Atualiza o nome de uma categoria existente no Firestore.
+ */
+export async function updateCategory(categoryId, newName) {
+    try {
+        const categoryRef = doc(db, 'categories', categoryId);
+        await updateDoc(categoryRef, { name: newName });
+        console.log("Categoria atualizada com sucesso: ", newName);
+    } catch (error) {
+        console.error("Erro ao atualizar categoria: ", error);
+    }
+}
+
+/**
+ * Deleta uma categoria do Firestore.
+ */
+export async function deleteCategory(categoryId) {
+    try {
+        await deleteDoc(doc(db, 'categories', categoryId));
+        console.log("Categoria deletada com sucesso: ", categoryId);
+    } catch (error) {
+        console.error("Erro ao deletar categoria: ", error);
+    }
+}
+
+
+// === FUNÇÃO DE INICIALIZAÇÃO E SINCRONIZAÇÃO (ATUALIZADA) ===
+export async function initializeStorage() {
+    console.log("Iniciando verificação de sincronia do armazenamento...");
+
+    // 1. Pega todas as categorias que já existem oficialmente na coleção 'categories'
+    const existingCategoriesSnapshot = await getDocs(categoriesCollection);
+    const existingCategoryNames = existingCategoriesSnapshot.docs.map(doc => doc.data().name);
+
+    // 2. Pega todos os artigos da coleção 'articles'
+    const articlesSnapshot = await getDocs(articlesCollection);
+    
+    // 3. Encontra todas as categorias únicas que estão sendo usadas nos artigos
+    const categoriesFromArticles = new Set();
+    articlesSnapshot.forEach(doc => {
+        if (doc.data().category) {
+            categoriesFromArticles.add(doc.data().category);
+        }
+    });
+
+    // 4. Compara as duas listas e cria na coleção 'categories' aquelas que estão faltando
+    for (const categoryName of categoriesFromArticles) {
+        if (!existingCategoryNames.includes(categoryName)) {
+            console.log(`Categoria "${categoryName}" encontrada nos artigos, mas não na coleção 'categories'. Criando...`);
+            await createCategory(categoryName);
+        }
+    }
+    console.log("Verificação do armazenamento concluída.");
 }
