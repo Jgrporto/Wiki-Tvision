@@ -1,5 +1,3 @@
-// js/admin.js (Refatorado para Firebase)
-
 import * as Storage from './storage.js';
 import * as UI from './ui.js';
 import * as D from './dom.js';
@@ -26,7 +24,7 @@ export function enterAdminMode() {
         document.body.classList.add('admin-mode');
         D.sidebarAdminLink.innerHTML = `<i class="fa-solid fa-right-from-bracket"></i><span>Sair do Modo Admin</span>`;
         alert('Acesso concedido. Bem-vindo, Administrador!');
-        displayAdminDashboard(); // Chama a nova função async
+        displayAdminDashboard(); // Chama a nova função unificada
     } else if (password) {
         alert('Senha incorreta. Acesso negado.');
     }
@@ -41,102 +39,188 @@ export function exitAdminMode() {
     window.location.reload();
 }
 
-// A função agora é ASYNC para poder esperar pelos dados do Firebase
+/**
+ * TELA ÚNICA E UNIFICADA DO PAINEL DE ADMINISTRAÇÃO
+ */
 export async function displayAdminDashboard() {
     UI.showView('admin');
-    const articles = await Storage.fetchArticles(); // Usa a nova função fetchArticles
-    
+    const [articles, categories] = await Promise.all([
+        Storage.fetchArticles(),
+        Storage.fetchCategories()
+    ]);
+
     D.adminView.innerHTML = `
         <div class="admin-header">
-            <h2>Painel Administrativo</h2>
-            <button id="admin-create-btn" class="btn btn-primary">Criar Novo Artigo</button>
+            <h2>Painel de Gerenciamento</h2>
+            <button id="admin-create-category-btn" class="btn btn-primary">Adicionar Nova Categoria</button>
         </div>
-        <div class="admin-article-list">
-            ${articles.map(article => `
-                <div class="admin-article-item">
-                    <div class="admin-article-item-info">
-                        <h4>${article.title}</h4>
-                        <span>Categoria: ${article.category}</span>
+
+        <div class="admin-category-group-list">
+            ${categories.map(category => {
+                const articlesInCategory = articles.filter(art => art.category === category.name);
+                return `
+                <div class="category-group">
+                    <div class="category-group-header">
+                        <div class="category-group-title">
+                            <h4>${category.name} (${articlesInCategory.length})</h4>
+                        </div>
+                        <div class="category-group-actions">
+                            <button class="btn btn-primary btn-sm" data-create-article-in-category="${category.name}">Criar Artigo</button>
+                            <button class="btn-icon" data-edit-category-id="${category.id}" data-category-name="${category.name}" title="Renomear Categoria"><i class="fa-solid fa-pen"></i></button>
+                            <button class="btn-icon" data-delete-category-id="${category.id}" title="Deletar Categoria"><i class="fa-solid fa-trash"></i></button>
+                        </div>
                     </div>
-                    <div class="admin-article-item-actions">
-                        <button class="btn btn-secondary btn-sm" data-edit-id="${article.id}">Editar</button>
-                        <button class="btn btn-danger btn-sm" data-delete-id="${article.id}">Deletar</button>
+                    <div class="admin-article-list">
+                        ${articlesInCategory.length > 0 ? articlesInCategory.map(article => `
+                            <div class="admin-article-item">
+                                <div class="admin-article-item-info">
+                                    <span>${article.title}</span>
+                                </div>
+                                <div class="admin-article-item-actions">
+                                    <button class="btn btn-secondary btn-sm" data-edit-id="${article.id}">Editar Artigo</button>
+                                    <button class="btn btn-danger btn-sm" data-delete-id="${article.id}">Apagar Artigo</button>
+                                </div>
+                            </div>
+                        `).join('') : '<p class="empty-category-message">Nenhum artigo nesta categoria.</p>'}
                     </div>
                 </div>
-            `).join('') || '<p>Nenhum artigo encontrado. Clique em "Criar Novo Artigo" para começar.</p>'}
+            `}).join('') || '<p>Nenhuma categoria encontrada.</p>'}
         </div>
     `;
 
-    D.adminView.querySelector('#admin-create-btn').addEventListener('click', () => {
-        displayFormView({
-            article: null, 
-            onSave: (data) => createArticle(data),
-            onBack: displayAdminDashboard
+    // Listeners para todas as ações
+    D.adminView.querySelector('#admin-create-category-btn').addEventListener('click', handleCreateCategory);
+    
+    D.adminView.querySelectorAll('[data-edit-category-id]').forEach(button => {
+        button.addEventListener('click', (e) => {
+            const categoryId = e.target.closest('button').dataset.editCategoryId;
+            const categoryName = e.target.closest('button').dataset.categoryName;
+            handleUpdateCategory(categoryId, categoryName);
         });
     });
-    
+
+    D.adminView.querySelectorAll('[data-delete-category-id]').forEach(button => {
+        button.addEventListener('click', (e) => {
+            const categoryId = e.target.closest('button').dataset.deleteCategoryId;
+            handleDeleteCategory(categoryId);
+        });
+    });
+
+    D.adminView.querySelectorAll('[data-create-article-in-category]').forEach(button => {
+        button.addEventListener('click', (e) => {
+            const categoryName = e.target.closest('button').dataset.createArticleInCategory;
+            const newArticleTemplate = { category: categoryName };
+            displayFormView({ article: newArticleTemplate, onSave: createArticle, onBack: displayAdminDashboard });
+        });
+    });
+
     D.adminView.querySelectorAll('[data-edit-id]').forEach(button => {
         button.addEventListener('click', (e) => {
             const articleId = e.target.dataset.editId;
-            // Encontra o artigo na lista que já foi baixada, sem precisar buscar de novo
             const articleToEdit = articles.find(a => a.id == articleId);
-            displayFormView({
-                article: articleToEdit, 
-                onSave: (data) => updateArticle(articleId, data),
-                onBack: displayAdminDashboard
-            });
+            displayFormView({ article: articleToEdit, onSave: (data) => updateArticle(articleId, data), onBack: displayAdminDashboard });
         });
     });
 
     D.adminView.querySelectorAll('[data-delete-id]').forEach(button => {
-        button.addEventListener('click', (e) => deleteArticle(e.target.dataset.deleteId));
+        button.addEventListener('click', (e) => {
+            const articleId = e.target.dataset.deleteId;
+            deleteArticle(articleId);
+        });
     });
 }
 
-// A função agora é ASYNC
 export async function createArticle(data) {
-    if (!data.title || !data.category) { // A verificação do conteúdo é opcional
+    if (!data.title || !data.category) {
         alert('Título e Categoria são obrigatórios.');
         return false;
     }
-    // A lógica de imagens foi removida daqui. Ela será feita no editor.js
     const newArticle = { 
         title: data.title,
         category: data.category,
         content: data.content || '', 
-        images: {} // Por enquanto, deixamos um objeto de imagens vazio
+        images: {}
     };
-    await Storage.createArticleInDb(newArticle); // Chama a nova função do storage
-    
+    await Storage.createArticleInDb(newArticle);
     alert('Artigo criado com sucesso!');
-    await displayAdminDashboard(); // Recarrega o painel
+    await displayAdminDashboard();
     return true;
 }
 
-// A função agora é ASYNC
 export async function updateArticle(id, data) {
     if (!data.title || !data.category) {
         alert('Título e Categoria são obrigatórios.');
         return false;
     }
-    
     const updatedData = {
         title: data.title,
         category: data.category,
         content: data.content || ''
     };
-    
-    await Storage.updateArticleInDb(id, updatedData); // Chama a nova função do storage
+    await Storage.updateArticleInDb(id, updatedData);
     alert('Artigo atualizado com sucesso!');
     await displayAdminDashboard();
     return true;
 }
 
-// A função agora é ASYNC
 export async function deleteArticle(id) {
     if (confirm('Tem certeza que deseja deletar este artigo?')) {
-        await Storage.deleteArticleInDb(id); // Chama a nova função do storage
+        await Storage.deleteArticleInDb(id);
         alert('Artigo deletado com sucesso.');
         await displayAdminDashboard();
     }
+}
+
+async function handleCreateCategory() {
+    showCategoryModal({
+        title: 'Adicionar Nova Categoria',
+        onSave: async (newName) => {
+            await Storage.createCategory(newName);
+            await displayAdminDashboard();
+        }
+    });
+}
+
+async function handleUpdateCategory(categoryId, oldName) {
+    showCategoryModal({
+        title: `Renomear Categoria "${oldName}"`,
+        value: oldName,
+        onSave: async (newName) => {
+            if (newName !== oldName) {
+                await Storage.updateCategory(categoryId, newName);
+                alert(`Categoria renomeada para "${newName}". Lembre-se de atualizar os artigos que usavam a categoria antiga.`);
+                await displayAdminDashboard();
+            }
+        }
+    });
+}
+
+async function handleDeleteCategory(categoryId) {
+    if (confirm("Tem certeza que deseja deletar esta categoria?\n\n(Atenção: os artigos que usam esta categoria NÃO serão deletados.)")) {
+        await Storage.deleteCategory(categoryId);
+        await displayAdminDashboard();
+    }
+}
+
+const categoryModal = document.getElementById('category-modal');
+const modalTitle = document.getElementById('modal-title');
+const modalInput = document.getElementById('modal-input');
+const modalCancelBtn = document.getElementById('modal-cancel-btn');
+const modalSaveBtn = document.getElementById('modal-save-btn');
+
+function showCategoryModal({ title, value = '', onSave }) {
+    modalTitle.textContent = title;
+    modalInput.value = value;
+    categoryModal.classList.remove('hidden');
+    modalInput.focus();
+    const newSaveBtn = modalSaveBtn.cloneNode(true);
+    modalSaveBtn.parentNode.replaceChild(newSaveBtn, modalSaveBtn);
+    const newCancelBtn = modalCancelBtn.cloneNode(true);
+    modalCancelBtn.parentNode.replaceChild(newCancelBtn, modalCancelBtn);
+    newSaveBtn.addEventListener('click', () => {
+        const inputValue = modalInput.value.trim();
+        if (inputValue) { onSave(inputValue); categoryModal.classList.add('hidden'); }
+    });
+    newCancelBtn.addEventListener('click', () => { categoryModal.classList.add('hidden'); });
+    window.onkeydown = (event) => { if (event.key === 'Escape') { categoryModal.classList.add('hidden'); } };
 }
