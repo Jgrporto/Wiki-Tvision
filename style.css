@@ -294,14 +294,8 @@ body {
 }
 
 /* ======================================== */
-/* 8. PAINEL ADMINISTRATIVO                 */
-/* ======================================== */
-
-/* ======================================== */
 /* 8. PAINEL ADMINISTRATIVO (UNIFICADO)     */
 /* ======================================== */
-
-/* --- Estilos Gerais do Painel --- */
 .admin-header {
     display: flex;
     justify-content: space-between;
@@ -309,6 +303,7 @@ body {
     padding-bottom: 24px;
     margin-bottom: 24px;
     border-bottom: 1px solid var(--cor-borda);
+    transition: border-color 0.3s ease;
 }
 .admin-header h2 {
     font-size: 1.8rem;
@@ -324,7 +319,8 @@ body {
     background-color: var(--cor-superficie);
     border-radius: var(--border-radius);
     box-shadow: var(--sombra-suave);
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+    border: 1px solid transparent;
 }
 .category-group-header {
     display: flex;
@@ -332,6 +328,7 @@ body {
     align-items: center;
     padding: 20px 24px;
     border-bottom: 1px solid var(--cor-borda);
+    transition: border-color 0.3s ease;
 }
 .category-group-title h4 {
     margin: 0;
@@ -346,7 +343,7 @@ body {
 
 /* --- Estilo da Lista de Artigos Dentro dos Grupos --- */
 .admin-article-list {
-    padding: 8px;
+    padding: 16px;
     display: grid;
     gap: 8px;
 }
@@ -355,10 +352,9 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 16px;
-    background-color: transparent; /* Remove fundo duplo */
+    background-color: var(--cor-fundo);
     border-radius: var(--border-radius);
-    box-shadow: none; /* Remove sombra dupla */
-    border: 1px solid transparent; /* Borda sutil para organização */
+    transition: background-color 0.3s ease;
 }
 .empty-category-message {
     padding: 16px;
@@ -404,6 +400,8 @@ body.dark-mode .btn-icon:hover {
 .btn-danger { background-color: #dc3545; color: var(--cor-texto-claro); }
 .btn-danger:hover { background-color: #c82333; }
 .btn-sm { padding: 6px 12px; font-size: 0.9rem; }
+
+
 /* ======================================== */
 /* 9. TELA DO EDITOR DE ARTIGO              */
 /* ======================================== */
@@ -854,4 +852,55 @@ body.dark-mode .btn-icon:hover {
 
 body.dark-mode .category-group .admin-article-item {
     border-color: var(--cor-borda);
+}
+
+/* ======================================== */
+/* 16. SELETOR DE ÍCONES NO MODAL           */
+/* ======================================== */
+
+#modal-icon-picker-wrapper {
+    margin-bottom: 24px;
+}
+
+.icon-picker-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+    gap: 12px;
+}
+
+.icon-picker-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 44px;
+    border: 2px solid var(--cor-borda);
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-size: 1.4rem;
+    color: #6c757d;
+    transition: all 0.2s ease-in-out;
+}
+
+.icon-picker-item:hover {
+    color: var(--cor-primaria);
+    border-color: var(--cor-primaria);
+}
+
+/* Regra mais importante: o estilo do ícone ATIVO/SELECIONADO */
+.icon-picker-item.active {
+    background-color: var(--cor-primaria);
+    border-color: var(--cor-primaria);
+    color: var(--cor-texto-claro);
+    transform: scale(1.1);
+}
+
+/* Ajustes para o modo escuro */
+body.dark-mode .icon-picker-item {
+    color: #9fb0c1;
+}
+body.dark-mode .icon-picker-item:hover {
+    color: var(--cor-primaria);
+}
+body.dark-mode .icon-picker-item.active {
+    color: var(--cor-superficie);
 }
