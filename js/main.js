@@ -6,29 +6,21 @@ import * as Admin from './admin.js';
 import { setupTheme } from './theme.js';
 
 /**
- * NOVA FUNÇÃO: Busca as categorias e cria os cards da página inicial.
+ * Busca as categorias e cria os cards da página inicial dinamicamente.
  */
 async function renderHomepageCards() {
     const categories = await Storage.fetchCategories();
     const cardContainer = document.querySelector('.card-container');
     
-    // Se não encontrar o container, interrompe a função
     if (!cardContainer) return;
 
-    // Limpa os cards estáticos que estão no HTML
     cardContainer.innerHTML = ''; 
 
-    // Cria um novo card para cada categoria vinda do Firebase
     if (categories.length > 0) {
         categories.forEach(category => {
-            // Define um ícone padrão ou customizado por categoria
-            const iconMap = {
-                'Técnico': 'fa-screwdriver-wrench',
-                'Planos': 'fa-receipt',
-                'Atendimento': 'fa-headset',
-                'Políticas': 'fa-building-shield'
-            };
-            const iconClass = iconMap[category.name] || 'fa-folder'; // Ícone padrão
+            // CORREÇÃO: Usa o ícone salvo no banco de dados para a categoria.
+            // Fornece 'fa-folder' como um ícone padrão caso nenhum tenha sido salvo.
+            const iconClass = category.icon || 'fa-folder';
 
             const card = document.createElement('div');
             card.className = 'card';
@@ -37,7 +29,6 @@ async function renderHomepageCards() {
                 <i class="fa-solid ${iconClass}"></i>
                 <span>${category.name}</span>
             `;
-            // Adiciona o listener de clique diretamente no novo card
             card.addEventListener('click', () => {
                 Router.displayCategory(card.dataset.category);
             });
@@ -55,10 +46,10 @@ document.addEventListener('DOMContentLoaded', () => {
     setupStaticEventListeners();
     
     if (Admin.isAdmin()) {
-        Admin.displayCategoryDashboard(); // Ajustado para a nova tela de admin
+        Admin.displayAdminDashboard(); 
     } else {
         Router.handleInitialRoute();
-        renderHomepageCards(); // Chama a função para renderizar os cards dinâmicos
+        renderHomepageCards();
     }
     
     console.log("Aplicação Wiki modularizada iniciada com sucesso!");
@@ -72,11 +63,10 @@ function setupStaticEventListeners() {
     D.homeLink.addEventListener('click', (e) => {
         e.preventDefault();
         if (Admin.isAdmin()) {
-            Admin.displayCategoryDashboard(); // Ajustado para a nova tela de admin
+            Admin.displayAdminDashboard(); 
         } else {
-            // Limpa o hash para garantir que a home seja exibida
             window.location.hash = '';
-            showView('welcome');
+            UI.showView('welcome'); // Usando a função importada de UI
             renderHomepageCards();
         }
     });
@@ -96,9 +86,6 @@ function setupStaticEventListeners() {
     D.heroSearchInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') performSearch();
     });
-
-    // A lógica de clique dos cards foi MOVIDA para dentro de renderHomepageCards
-    // Portanto, o D.quickAccessCards.forEach() foi REMOVIDO daqui.
 
     window.addEventListener('popstate', (event) => {
         if (Admin.isAdmin()) return;
