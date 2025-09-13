@@ -1,18 +1,12 @@
-// js/storage.js (Versão Final com Sincronização de Categorias)
-
 import { db } from './firebase-config.js';
 import { collection, getDocs, addDoc, doc, updateDoc, deleteDoc, query, where } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
-// === REFERÊNCIAS DAS COLEÇÕES ===
 const articlesCollection = collection(db, 'articles');
 const categoriesCollection = collection(db, 'categories');
 
 
 // === FUNÇÕES DOS ARTIGOS ===
 
-/**
- * Busca todos os artigos do Firestore.
- */
 export async function fetchArticles() {
     try {
         const querySnapshot = await getDocs(articlesCollection);
@@ -27,9 +21,6 @@ export async function fetchArticles() {
     }
 }
 
-/**
- * Cria um novo artigo no Firestore.
- */
 export async function createArticleInDb(articleData) {
     try {
         const docRef = await addDoc(articlesCollection, articleData);
@@ -41,9 +32,6 @@ export async function createArticleInDb(articleData) {
     }
 }
 
-/**
- * Atualiza um artigo existente no Firestore.
- */
 export async function updateArticleInDb(articleId, articleData) {
     try {
         const articleRef = doc(db, 'articles', articleId);
@@ -54,9 +42,6 @@ export async function updateArticleInDb(articleId, articleData) {
     }
 }
 
-/**
- * Deleta um artigo do Firestore.
- */
 export async function deleteArticleInDb(articleId) {
     try {
         await deleteDoc(doc(db, 'articles', articleId));
@@ -69,9 +54,6 @@ export async function deleteArticleInDb(articleId) {
 
 // === FUNÇÕES DAS CATEGORIAS ===
 
-/**
- * Busca todas as categorias do Firestore.
- */
 export async function fetchCategories() {
     try {
         const querySnapshot = await getDocs(categoriesCollection);
@@ -86,34 +68,29 @@ export async function fetchCategories() {
     }
 }
 
-/**
- * Cria uma nova categoria no Firestore.
- */
-export async function createCategory(categoryName) {
+export async function createCategory(categoryData) {
     try {
-        await addDoc(categoriesCollection, { name: categoryName });
-        console.log("Categoria criada com sucesso: ", categoryName);
+        const dataToSave = {
+            name: categoryData.name,
+            icon: categoryData.icon || 'fa-folder' 
+        };
+        await addDoc(categoriesCollection, dataToSave);
+        console.log("Categoria criada com sucesso: ", categoryData.name);
     } catch (error) {
         console.error("Erro ao criar categoria: ", error);
     }
 }
 
-/**
- * Atualiza o nome de uma categoria existente no Firestore.
- */
-export async function updateCategory(categoryId, newName) {
+export async function updateCategory(categoryId, categoryData) {
     try {
         const categoryRef = doc(db, 'categories', categoryId);
-        await updateDoc(categoryRef, { name: newName });
-        console.log("Categoria atualizada com sucesso: ", newName);
+        await updateDoc(categoryRef, categoryData);
+        console.log("Categoria atualizada com sucesso: ", categoryData.name);
     } catch (error) {
         console.error("Erro ao atualizar categoria: ", error);
     }
 }
 
-/**
- * Deleta uma categoria do Firestore.
- */
 export async function deleteCategory(categoryId) {
     try {
         await deleteDoc(doc(db, 'categories', categoryId));
@@ -124,18 +101,12 @@ export async function deleteCategory(categoryId) {
 }
 
 
-// === FUNÇÃO DE INICIALIZAÇÃO E SINCRONIZAÇÃO (ATUALIZADA) ===
+// === FUNÇÃO DE INICIALIZAÇÃO E SINCRONIZAÇÃO ===
 export async function initializeStorage() {
     console.log("Iniciando verificação de sincronia do armazenamento...");
-
-    // 1. Pega todas as categorias que já existem oficialmente na coleção 'categories'
     const existingCategoriesSnapshot = await getDocs(categoriesCollection);
     const existingCategoryNames = existingCategoriesSnapshot.docs.map(doc => doc.data().name);
-
-    // 2. Pega todos os artigos da coleção 'articles'
     const articlesSnapshot = await getDocs(articlesCollection);
-    
-    // 3. Encontra todas as categorias únicas que estão sendo usadas nos artigos
     const categoriesFromArticles = new Set();
     articlesSnapshot.forEach(doc => {
         if (doc.data().category) {
@@ -143,11 +114,10 @@ export async function initializeStorage() {
         }
     });
 
-    // 4. Compara as duas listas e cria na coleção 'categories' aquelas que estão faltando
     for (const categoryName of categoriesFromArticles) {
         if (!existingCategoryNames.includes(categoryName)) {
-            console.log(`Categoria "${categoryName}" encontrada nos artigos, mas não na coleção 'categories'. Criando...`);
-            await createCategory(categoryName);
+            console.log(`Categoria "${categoryName}" encontrada, criando documento oficial...`);
+            await createCategory({ name: categoryName, icon: 'fa-folder' });
         }
     }
     console.log("Verificação do armazenamento concluída.");
